@@ -106,6 +106,25 @@ describe('PointService', () => {
     });
   });
 
+  describe('포인트 조회 테스트', () => {
+    it('포인트 조회 시, 사용자의 포인트가 올바르게 조회되는지 테스트', async () => {
+      //given
+      await pointService.charge(1, new PointBody(1000));
+      //when
+      const result = await pointService.getPoint(1);
+      //then
+      expect(result.getPoint()).toBe(1000);
+    });
+
+    it('포인트 조회 시, 사용자의 포인트가 없을 경우 0을 반환하는지 테스트', async () => {
+      //given
+      //when
+      const result = await pointService.getPoint(1);
+      //then
+      expect(result.getPoint()).toBe(0);
+    });
+  });
+
   describe('포인트 사용 테스트', () => {
     it('포인트 사용 시, 사용한 금액만큼 포인트가 차감되는지 테스트', async () => {
       //given
