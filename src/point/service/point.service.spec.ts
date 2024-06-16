@@ -84,20 +84,21 @@ describe('PointService', () => {
 
     it('포인트를 여러번 충전 했을때 잔액이 올바르게 누적되는지 테스트', async () => {
       //given
+      await pointService.charge(1, new PointBody(1000));
+      await pointService.charge(1, new PointBody(1000));
       //when
-      await pointService.charge(1, new PointBody(1000));
-      await pointService.charge(1, new PointBody(1000));
       const result = await pointService.getPoint(1);
       //then
       expect(result.getPoint()).toBe(2000);
     });
 
     it('userPointMapper.toDomain과 toDto가 올바르게 호출되는지 테스트', async () => {
+      //given
       const toDomainSpy = jest.spyOn(userPointMapper, 'toDomain');
       const toDtoSpy = jest.spyOn(userPointMapper, 'toDto');
-
+      //when
       await pointService.charge(1, new PointBody(1000));
-
+      //then
       expect(toDomainSpy).toHaveBeenCalled();
       expect(toDtoSpy).toHaveBeenCalled();
       toDomainSpy.mockRestore();
