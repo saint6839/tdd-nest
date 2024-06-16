@@ -98,12 +98,12 @@ describe('PointService', () => {
   describe('포인트 사용 테스트', () => {
     it('포인트 사용 시, 사용한 금액만큼 포인트가 차감되는지 테스트', async () => {
       //given
-      //when
       await pointService.charge(1, new PointBody(1000));
+      //when
       await pointService.use(1, new PointBody(500));
       const result = await pointService.getPoint(1);
       //then
-      expect(result).toBe(500);
+      expect(result.getPoint()).toBe(500);
     });
 
     it('포인트 사용 시, 사용 이력(PointHistory)가 잘 생성되는지 테스트', async () => {

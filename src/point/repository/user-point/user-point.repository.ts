@@ -9,8 +9,8 @@ export const USER_POINT_REPOSITORY_TOKEN = Symbol('IUserPointRepository');
 export class UserPointRepository implements IUserPointRepository {
   constructor(private readonly userPointModel: UserPointTable) {}
 
-  selectById(id: number): Promise<UserPoint> {
-    throw new Error('Method not implemented.');
+  async selectById(id: number): Promise<UserPoint> {
+    return this.userPointModel.selectById(id);
   }
   async insertOrUpdate(id: number, amount: number): Promise<UserPoint> {
     return this.userPointModel.insertOrUpdate(id, amount);

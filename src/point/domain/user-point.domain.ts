@@ -1,8 +1,8 @@
 export class UserPointDomain {
   constructor(
     private readonly id: number,
-    private readonly point: number,
-    private readonly updateMillis: number,
+    private point: number,
+    private updateMillis: number,
   ) {
     this.id = id;
     this.point = point;
@@ -30,5 +30,13 @@ export class UserPointDomain {
 
   getUpdateMillis(): number {
     return this.updateMillis;
+  }
+
+  public use(amount: number): void {
+    if (this.point < amount) {
+      throw new Error('포인트가 부족합니다.');
+    }
+
+    this.point -= amount;
   }
 }

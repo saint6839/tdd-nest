@@ -1,3 +1,4 @@
+import { PointBody } from './../dto/point.dto';
 import {
   Body,
   Controller,

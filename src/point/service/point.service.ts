@@ -10,6 +10,8 @@ import { UserPointMapper } from '../mapper/user-point.mapper';
 import { UserPointResponseDto } from '../dto/user-point/user-point.response.dto';
 import { PointBody as PointDto } from '../dto/point.dto';
 import { PointHistoryDomain } from '../domain/point-history.domain';
+import { PointHistoryResponseDto } from '../dto/point-history/point-history.response.dto';
+import { UserPointDomain } from '../domain/user-point.domain';
 
 export const POINT_SERVICE_TOKEN = Symbol('IPointService');
 
@@ -45,13 +47,36 @@ export class PointService implements IPointService {
     return this.userPointMapper.toDto(userPointDomain);
   }
 
-  use(userId: number, amount: PointDto): Promise<void> {
-    throw new Error('Method not implemented.');
+  async use(userId: number, amount: PointDto): Promise<UserPointResponseDto> {
+    await this.pointHistoryRepository.insert(
+      PointHistoryDomain.create(
+        userId,
+        amount.getAmount(),
+        TransactionType.USE,
+        Date.now(),
+      ),
+    );
+
+    const beforeUseUserPointEntity =
+      await this.userPointRepository.selectById(userId);
+    const userPointDomain: UserPointDomain = this.userPointMapper.toDomain(
+      beforeUseUserPointEntity,
+    );
+    userPointDomain.use(amount.getAmount());
+
+    await this.userPointRepository.insertOrUpdate(
+      userId,
+      userPointDomain.getPoint(),
+    );
+    return this.userPointMapper.toDto(userPointDomain);
   }
-  getPoint(userId: number): Promise<number> {
-    throw new Error('Method not implemented.');
+  async getPoint(userId: number): Promise<UserPointResponseDto> {
+    const userPointEntity = await this.userPointRepository.selectById(userId);
+    const userPointDomain = this.userPointMapper.toDomain(userPointEntity);
+    return this.userPointMapper.toDto(userPointDomain);
   }
-  getHistory(userId: number): Promise<any[]> {
+
+  async getHistory(userId: number): Promise<PointHistoryResponseDto[]> {
     throw new Error('Method not implemented.');
   }
 }
