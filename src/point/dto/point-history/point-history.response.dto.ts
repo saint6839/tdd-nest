@@ -1,12 +1,18 @@
 import { TransactionType } from 'src/point/model/point.model';
 
 export class PointHistoryResponseDto {
+  public id: number;
+  public userId: number;
+  public amount: number;
+  public type: TransactionType;
+  public timeMillis: number;
+
   constructor(
-    private readonly id: number,
-    private readonly userId: number,
-    private readonly amount: number,
-    private readonly type: TransactionType,
-    private readonly timeMillis: number,
+    id: number,
+    userId: number,
+    amount: number,
+    type: TransactionType,
+    timeMillis: number,
   ) {
     this.id = id;
     this.userId = userId;

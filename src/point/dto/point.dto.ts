@@ -2,5 +2,13 @@ import { IsInt } from 'class-validator';
 
 export class PointBody {
   @IsInt()
-  amount: number;
+  public amount: number;
+
+  constructor(amount: number) {
+    this.amount = amount;
+  }
+
+  getAmount(): number {
+    return this.amount;
+  }
 }
