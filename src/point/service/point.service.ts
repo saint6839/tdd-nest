@@ -48,6 +48,7 @@ export class PointService implements IPointService {
     const amount = pointDto.getAmount();
     const transactionTime = Date.now();
 
+    // 사용자의 포인트 충전 시, 동시성 문제를 해결하기 위해 Mutex 사용
     const mutex = this.getMutex(userId);
     const release = await mutex.lock();
 
@@ -97,29 +98,37 @@ export class PointService implements IPointService {
     const amount = pointDto.getAmount();
     const transactionTime = Date.now();
 
-    // 포인트 이력 저장
-    await this.pointHistoryRepository.insert(
-      PointHistoryDomain.create(
-        userId,
-        amount,
-        TransactionType.USE,
-        transactionTime,
-      ),
-    );
+    // 사용자의 포인트 사용 시, 동시성 문제를 해결하기 위해 Mutex 사용
+    const mutex = this.getMutex(userId);
+    const release = await mutex.lock();
 
-    // 사용자 기존 포인트 조회
-    const userPointEntity = await this.userPointRepository.selectById(userId);
-    if (!userPointEntity) {
-      throw new Error('사용자의 포인트가 존재하지 않습니다.');
+    try {
+      // 포인트 이력 저장
+      await this.pointHistoryRepository.insert(
+        PointHistoryDomain.create(
+          userId,
+          amount,
+          TransactionType.USE,
+          transactionTime,
+        ),
+      );
+
+      // 사용자 기존 포인트 조회
+      const userPointEntity = await this.userPointRepository.selectById(userId);
+      if (!userPointEntity) {
+        throw new Error('사용자의 포인트가 존재하지 않습니다.');
+      }
+
+      // 포인트 사용 처리
+      const userPointDomain = this.userPointMapper.toDomain(userPointEntity);
+      userPointDomain.use(amount, transactionTime);
+      await this.userPointRepository.insertOrUpdate(userPointDomain);
+
+      // DTO 변환 후 반환
+      return this.userPointMapper.toDto(userPointDomain);
+    } finally {
+      release();
     }
-
-    // 포인트 사용 처리
-    const userPointDomain = this.userPointMapper.toDomain(userPointEntity);
-    userPointDomain.use(amount, transactionTime);
-    await this.userPointRepository.insertOrUpdate(userPointDomain);
-
-    // DTO 변환 후 반환
-    return this.userPointMapper.toDto(userPointDomain);
   }
 
   /**
