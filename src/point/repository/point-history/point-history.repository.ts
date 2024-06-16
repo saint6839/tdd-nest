@@ -22,6 +22,6 @@ export class PointHistoryRepository implements IPointHistoryRepository {
     );
   }
   selectAllByUserId(userId: number): Promise<PointHistory[]> {
-    throw new Error('Method not implemented.');
+    return this.pointHistoryModel.selectAllByUserId(userId);
   }
 }

@@ -112,12 +112,30 @@ export class PointService implements IPointService {
    * @returns 사용자의 현재 포인트
    */
   async getPoint(userId: number): Promise<UserPointResponseDto> {
+    // 사용자 포인트 조회
     const userPointEntity = await this.userPointRepository.selectById(userId);
     const userPointDomain = this.userPointMapper.toDomain(userPointEntity);
+
+    // DTO 변환 후 반환
     return this.userPointMapper.toDto(userPointDomain);
   }
 
+  /**
+   * @description 사용자의 포인트 이력을 조회합니다.
+   * @param userId 포인트 이력을 조회할 사용자 ID
+   * @returns 사용자의 포인트 이력
+   */
   async getHistory(userId: number): Promise<PointHistoryResponseDto[]> {
-    throw new Error('Method not implemented.');
+    // 사용자 포인트 이력 조회
+    const pointHistoryEntities =
+      await this.pointHistoryRepository.selectAllByUserId(userId);
+    const pointHistoryDomains = pointHistoryEntities.map(entity =>
+      this.pointHistoryMapper.toDomain(entity),
+    );
+
+    // DTO 변환 후 반환
+    return pointHistoryDomains.map(domain =>
+      this.pointHistoryMapper.toDto(domain),
+    );
   }
 }
