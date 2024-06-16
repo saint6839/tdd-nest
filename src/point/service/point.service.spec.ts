@@ -104,6 +104,22 @@ describe('PointService', () => {
       }
     });
 
+    it('포인트 충전 시, 동시에 한 사용자의 계정에 대해 여러번의 충전이 발생했을 때 충전이 잘 이루어지는지 테스트', async () => {
+      //given
+      const chargeSpy = jest.spyOn(pointService, 'charge');
+      await Promise.all([
+        pointService.charge(1, new PointBody(1000)),
+        pointService.charge(1, new PointBody(2000)),
+        pointService.charge(1, new PointBody(3000)),
+      ]);
+      //when
+      const result = await pointService.getPoint(1);
+
+      //then
+      expect(result.getPoint()).toBe(6000);
+      expect(chargeSpy).toHaveBeenCalledTimes(3);
+      chargeSpy.mockRestore();
+    });
     it('userPointMapper.toDomain과 toDto가 올바르게 호출되는지 테스트', async () => {
       //given
       const toDomainSpy = jest.spyOn(userPointMapper, 'toDomain');
