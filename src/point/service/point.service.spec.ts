@@ -120,6 +120,28 @@ describe('PointService', () => {
       expect(chargeSpy).toHaveBeenCalledTimes(3);
       chargeSpy.mockRestore();
     });
+
+    it('포인트 충전 시, 여러 사용자가 동시에 충전을 요청했을 때 충전이 잘 이루어지는지 테스트', async () => {
+      //given
+      const chargeSpy = jest.spyOn(pointService, 'charge');
+      await Promise.all([
+        pointService.charge(1, new PointBody(1000)),
+        pointService.charge(2, new PointBody(2000)),
+        pointService.charge(3, new PointBody(3000)),
+      ]);
+      //when
+      const result1 = await pointService.getPoint(1);
+      const result2 = await pointService.getPoint(2);
+      const result3 = await pointService.getPoint(3);
+
+      //then
+      expect(result1.getPoint()).toBe(1000);
+      expect(result2.getPoint()).toBe(2000);
+      expect(result3.getPoint()).toBe(3000);
+      expect(chargeSpy).toHaveBeenCalledTimes(3);
+      chargeSpy.mockRestore();
+    });
+
     it('userPointMapper.toDomain과 toDto가 올바르게 호출되는지 테스트', async () => {
       //given
       const toDomainSpy = jest.spyOn(userPointMapper, 'toDomain');
