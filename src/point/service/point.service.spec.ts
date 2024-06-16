@@ -168,4 +168,17 @@ describe('PointService', () => {
       expect(result.getPoint()).toBe(200);
     });
   });
+
+  describe('포인트 이력 조회 테스트', () => {
+    it('포인트 이력 조회 시, 사용자의 모든 포인트 이력이 조회되는지 테스트', async () => {
+      //given
+      await pointService.charge(1, new PointBody(1000));
+      await pointService.use(1, new PointBody(500));
+      await pointService.use(1, new PointBody(300));
+      //when
+      const result = await pointService.getHistory(1);
+      //then
+      expect(result.length).toBe(3);
+    });
+  });
 });
