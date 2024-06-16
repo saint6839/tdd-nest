@@ -94,4 +94,37 @@ describe('PointService', () => {
       toDtoSpy.mockRestore();
     });
   });
+
+  describe('포인트 사용 테스트', () => {
+    it('포인트 사용 시, 사용한 금액만큼 포인트가 차감되는지 테스트', async () => {
+      //given
+      //when
+      await pointService.charge(1, new PointBody(1000));
+      await pointService.use(1, new PointBody(500));
+      const result = await pointService.getPoint(1);
+      //then
+      expect(result).toBe(500);
+    });
+
+    it('포인트 사용 시, 사용 이력(PointHistory)가 잘 생성되는지 테스트', async () => {
+      //given
+      await pointService.charge(1, new PointBody(1000));
+      const pointHistoryInsertSpy = jest.spyOn(
+        pointHistoryRepository,
+        'insert',
+      );
+      //when
+      await pointService.use(1, new PointBody(500));
+      //then
+      expect(pointHistoryInsertSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: 1,
+          amount: 500,
+          type: TransactionType.USE,
+          timeMillis: expect.any(Number),
+        }),
+      );
+      pointHistoryInsertSpy.mockRestore();
+    });
+  });
 });
