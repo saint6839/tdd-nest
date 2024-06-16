@@ -6,10 +6,10 @@ import {
   Patch,
   ValidationPipe,
 } from '@nestjs/common';
-import { PointHistory, TransactionType, UserPoint } from './point.model';
 import { UserPointTable } from 'src/database/userpoint.table';
 import { PointHistoryTable } from 'src/database/pointhistory.table';
-import { PointBody as PointDto } from './point.dto';
+import { PointHistory, UserPoint } from '../model/point.model';
+import { PointBody as PointDto } from '../dto/point.dto';
 
 @Controller('/point')
 export class PointController {
