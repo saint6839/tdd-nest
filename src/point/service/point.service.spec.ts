@@ -178,7 +178,12 @@ describe('PointService', () => {
       //when
       const result = await pointService.getHistory(1);
       //then
-      expect(result.length).toBe(3);
+      expect(result[0].getType()).toBe(TransactionType.CHARGE);
+      expect(result[0].getAmount()).toBe(1000);
+      expect(result[1].getType()).toBe(TransactionType.USE);
+      expect(result[1].getAmount()).toBe(500);
+      expect(result[2].getType()).toBe(TransactionType.USE);
+      expect(result[2].getAmount()).toBe(300);
     });
   });
 });
