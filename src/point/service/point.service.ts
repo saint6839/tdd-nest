@@ -12,6 +12,7 @@ import { PointBody as PointDto } from '../dto/point.dto';
 import { PointHistoryDomain } from '../domain/point-history.domain';
 import { PointHistoryResponseDto } from '../dto/point-history/point-history.response.dto';
 import { UserPointDomain } from '../domain/user-point.domain';
+import { Mutex } from 'src/utils/mutex';
 
 export const POINT_SERVICE_TOKEN = Symbol('IPointService');
 
@@ -26,6 +27,14 @@ export class PointService implements IPointService {
     private readonly userPointMapper: UserPointMapper,
   ) {}
 
+  private mutexes: Map<number, Mutex> = new Map();
+  private getMutex(userId: number): Mutex {
+    if (!this.mutexes.has(userId)) {
+      this.mutexes.set(userId, new Mutex());
+    }
+    return this.mutexes.get(userId);
+  }
+
   /**
    * @description 사용자의 포인트를 충전합니다.
    * @param userId 충전할 사용자 ID
@@ -39,36 +48,43 @@ export class PointService implements IPointService {
     const amount = pointDto.getAmount();
     const transactionTime = Date.now();
 
-    // 포인트 이력 저장
-    await this.pointHistoryRepository.insert(
-      PointHistoryDomain.create(
-        userId,
-        amount,
-        TransactionType.CHARGE,
-        transactionTime,
-      ),
-    );
+    const mutex = this.getMutex(userId);
+    const release = await mutex.lock();
 
-    // 사용자 기존 포인트 조회
-    let userPointEntity = await this.userPointRepository.selectById(userId);
+    try {
+      // 포인트 이력 저장
+      await this.pointHistoryRepository.insert(
+        PointHistoryDomain.create(
+          userId,
+          amount,
+          TransactionType.CHARGE,
+          transactionTime,
+        ),
+      );
 
-    // 기존 포인트가 없는 경우 새로 생성
-    if (!userPointEntity) {
-      const newUserPointDomain = UserPointDomain.create(userId, amount);
-      newUserPointDomain.charge(amount, transactionTime);
-      await this.userPointRepository.insertOrUpdate(newUserPointDomain);
-      userPointEntity = await this.userPointRepository.selectById(userId);
-    } else {
-      // 기존 사용자 포인트에 충전
+      // 사용자 기존 포인트 조회
+      let userPointEntity = await this.userPointRepository.selectById(userId);
+
+      // 기존 포인트가 없는 경우 새로 생성
+      if (!userPointEntity) {
+        const newUserPointDomain = UserPointDomain.create(userId, amount);
+        newUserPointDomain.charge(amount, transactionTime);
+        await this.userPointRepository.insertOrUpdate(newUserPointDomain);
+        userPointEntity = await this.userPointRepository.selectById(userId);
+      } else {
+        // 기존 사용자 포인트에 충전
+        const userPointDomain = this.userPointMapper.toDomain(userPointEntity);
+        userPointDomain.charge(amount, transactionTime);
+        await this.userPointRepository.insertOrUpdate(userPointDomain);
+        userPointEntity = await this.userPointRepository.selectById(userId);
+      }
+
+      // DTO 변환 후 반환
       const userPointDomain = this.userPointMapper.toDomain(userPointEntity);
-      userPointDomain.charge(amount, transactionTime);
-      await this.userPointRepository.insertOrUpdate(userPointDomain);
-      userPointEntity = await this.userPointRepository.selectById(userId);
+      return this.userPointMapper.toDto(userPointDomain);
+    } finally {
+      release();
     }
-
-    // DTO 변환 후 반환
-    const userPointDomain = this.userPointMapper.toDomain(userPointEntity);
-    return this.userPointMapper.toDto(userPointDomain);
   }
 
   /**
