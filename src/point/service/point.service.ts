@@ -39,11 +39,28 @@ export class PointService implements IPointService {
       ),
     );
 
-    const userPointEntity = await this.userPointRepository.insertOrUpdate(
-      userId,
-      pointDto.getAmount(),
+    const beforeChargeUserPointEntity =
+      await this.userPointRepository.selectById(userId);
+
+    if (!beforeChargeUserPointEntity) {
+      await this.userPointRepository.insertOrUpdate(
+        userId,
+        pointDto.getAmount(),
+      );
+      const userPointEntity = await this.userPointRepository.selectById(userId);
+      const userPointDomain = this.userPointMapper.toDomain(userPointEntity);
+      return this.userPointMapper.toDto(userPointDomain);
+    }
+
+    const userPointDomain: UserPointDomain = this.userPointMapper.toDomain(
+      beforeChargeUserPointEntity,
     );
-    const userPointDomain = this.userPointMapper.toDomain(userPointEntity);
+
+    userPointDomain.charge(pointDto.getAmount());
+    await this.userPointRepository.insertOrUpdate(
+      userId,
+      userPointDomain.getPoint(),
+    );
     return this.userPointMapper.toDto(userPointDomain);
   }
 
