@@ -12,7 +12,7 @@ export class UserPointRepository implements IUserPointRepository {
   selectById(id: number): Promise<UserPoint> {
     throw new Error('Method not implemented.');
   }
-  insertOrUpdate(id: number, amount: number): Promise<UserPoint> {
-    throw new Error('Method not implemented.');
+  async insertOrUpdate(id: number, amount: number): Promise<UserPoint> {
+    return this.userPointModel.insertOrUpdate(id, amount);
   }
 }

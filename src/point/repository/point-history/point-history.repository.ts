@@ -1,3 +1,4 @@
+import { PointHistoryMapper } from '../../mapper/point-history.mapper';
 import { IPointHistoryRepository as IPointHistoryRepository } from './point-history.repository.interface';
 import { Injectable } from '@nestjs/common';
 import { PointHistoryTable } from 'src/database/pointhistory.table';
@@ -7,14 +8,22 @@ export const POINT_HISTORY_REPOSITORY_TOKEN = Symbol('IPointHistoryRepository');
 
 @Injectable()
 export class PointHistoryRepository implements IPointHistoryRepository {
-  constructor(private readonly pointHistoryModel: PointHistoryTable) {}
-  insert(
+  constructor(
+    private readonly pointHistoryModel: PointHistoryTable,
+    private readonly pointHistoryMapper: PointHistoryMapper,
+  ) {}
+  async insert(
     userId: number,
     amount: number,
-    transactionType: string,
+    transactionType: TransactionType,
     timestamp: number,
   ): Promise<PointHistory> {
-    throw new Error('Method not implemented.');
+    return this.pointHistoryModel.insert(
+      userId,
+      amount,
+      transactionType,
+      timestamp,
+    );
   }
   selectAllByUserId(userId: number): Promise<PointHistory[]> {
     throw new Error('Method not implemented.');
