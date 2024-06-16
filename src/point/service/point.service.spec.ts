@@ -121,6 +121,23 @@ describe('PointService', () => {
       chargeSpy.mockRestore();
     });
 
+    it('포인트 충전 시, 동시에 한 사용자의 계정에 대해 여러번의 충전이 발생 했을 때 충전 이력이 잘 생성되는지 테스트', async () => {
+      //given
+      const pointHistoryInsertSpy = jest.spyOn(
+        pointHistoryRepository,
+        'insert',
+      );
+      //when
+      await Promise.all([
+        pointService.charge(1, new PointBody(1000)),
+        pointService.charge(1, new PointBody(2000)),
+        pointService.charge(1, new PointBody(3000)),
+      ]);
+      //then
+      expect(pointHistoryInsertSpy).toHaveBeenCalledTimes(3);
+      pointHistoryInsertSpy.mockRestore();
+    });
+
     it('포인트 충전 시, 여러 사용자가 동시에 충전을 요청했을 때 충전이 잘 이루어지는지 테스트', async () => {
       //given
       const chargeSpy = jest.spyOn(pointService, 'charge');
@@ -140,6 +157,23 @@ describe('PointService', () => {
       expect(result3.getPoint()).toBe(3000);
       expect(chargeSpy).toHaveBeenCalledTimes(3);
       chargeSpy.mockRestore();
+    });
+
+    it('포인트 충전 시, 여러 사용자가 동시에 충전을 요청했을 때 충전 이력이 잘 생성되는지 테스트', async () => {
+      //given
+      const pointHistoryInsertSpy = jest.spyOn(
+        pointHistoryRepository,
+        'insert',
+      );
+      //when
+      await Promise.all([
+        pointService.charge(1, new PointBody(1000)),
+        pointService.charge(2, new PointBody(2000)),
+        pointService.charge(3, new PointBody(3000)),
+      ]);
+      //then
+      expect(pointHistoryInsertSpy).toHaveBeenCalledTimes(3);
+      pointHistoryInsertSpy.mockRestore();
     });
 
     it('userPointMapper.toDomain과 toDto가 올바르게 호출되는지 테스트', async () => {
@@ -260,6 +294,24 @@ describe('PointService', () => {
       useSpy.mockRestore();
     });
 
+    it('포인트 사용 시, 한 사용자가 동시에 여러번의 사용을 요청했을 때 사용 이력이 잘 생성되는지 테스트', async () => {
+      //given
+      await pointService.charge(1, new PointBody(1000));
+      const pointHistoryInsertSpy = jest.spyOn(
+        pointHistoryRepository,
+        'insert',
+      );
+      //when
+      await Promise.all([
+        pointService.use(1, new PointBody(500)),
+        pointService.use(1, new PointBody(300)),
+        pointService.use(1, new PointBody(200)),
+      ]);
+      //then
+      expect(pointHistoryInsertSpy).toHaveBeenCalledTimes(3);
+      pointHistoryInsertSpy.mockRestore();
+    });
+
     it('포인트 사용 시, 여러 사용자가 동시에 사용을 요청했을 때 사용이 잘 이루어지는지 테스트', async () => {
       //given
       await pointService.charge(1, new PointBody(1000));
@@ -281,6 +333,26 @@ describe('PointService', () => {
       expect(result3.getPoint()).toBe(1000);
       expect(useSpy).toHaveBeenCalledTimes(3);
       useSpy.mockRestore();
+    });
+
+    it('포인트 사용 시, 여러 사용자가 동시에 사용을 요청했을 때 사용 이력이 잘 생성되는지 테스트', async () => {
+      //given
+      await pointService.charge(1, new PointBody(1000));
+      await pointService.charge(2, new PointBody(2000));
+      await pointService.charge(3, new PointBody(3000));
+      const pointHistoryInsertSpy = jest.spyOn(
+        pointHistoryRepository,
+        'insert',
+      );
+      //when
+      await Promise.all([
+        pointService.use(1, new PointBody(500)),
+        pointService.use(2, new PointBody(1000)),
+        pointService.use(3, new PointBody(2000)),
+      ]);
+      //then
+      expect(pointHistoryInsertSpy).toHaveBeenCalledTimes(3);
+      pointHistoryInsertSpy.mockRestore();
     });
   });
 
