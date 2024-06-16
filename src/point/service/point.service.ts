@@ -30,63 +30,70 @@ export class PointService implements IPointService {
     userId: number,
     pointDto: PointDto,
   ): Promise<UserPointResponseDto> {
+    const amount = pointDto.getAmount();
+    const transactionTime = Date.now();
+
+    // 포인트 이력 저장
     await this.pointHistoryRepository.insert(
       PointHistoryDomain.create(
         userId,
-        pointDto.getAmount(),
+        amount,
         TransactionType.CHARGE,
-        Date.now(),
+        transactionTime,
       ),
     );
 
-    const beforeChargeUserPointEntity =
-      await this.userPointRepository.selectById(userId);
+    // 사용자 기존 포인트 조회
+    let userPointEntity = await this.userPointRepository.selectById(userId);
 
-    if (!beforeChargeUserPointEntity) {
-      await this.userPointRepository.insertOrUpdate(
-        userId,
-        pointDto.getAmount(),
-      );
-      const userPointEntity = await this.userPointRepository.selectById(userId);
+    // 기존 포인트가 없는 경우 새로 생성
+    if (!userPointEntity) {
+      const newUserPointDomain = UserPointDomain.create(userId, amount);
+      newUserPointDomain.charge(amount, transactionTime);
+      await this.userPointRepository.insertOrUpdate(newUserPointDomain);
+      userPointEntity = await this.userPointRepository.selectById(userId);
+    } else {
+      // 기존 사용자 포인트에 충전
       const userPointDomain = this.userPointMapper.toDomain(userPointEntity);
-      return this.userPointMapper.toDto(userPointDomain);
+      userPointDomain.charge(amount, transactionTime);
+      await this.userPointRepository.insertOrUpdate(userPointDomain);
+      userPointEntity = await this.userPointRepository.selectById(userId);
     }
 
-    const userPointDomain: UserPointDomain = this.userPointMapper.toDomain(
-      beforeChargeUserPointEntity,
-    );
-
-    userPointDomain.charge(pointDto.getAmount());
-    await this.userPointRepository.insertOrUpdate(
-      userId,
-      userPointDomain.getPoint(),
-    );
+    // DTO 변환 후 반환
+    const userPointDomain = this.userPointMapper.toDomain(userPointEntity);
     return this.userPointMapper.toDto(userPointDomain);
   }
 
-  async use(userId: number, amount: PointDto): Promise<UserPointResponseDto> {
+  async use(userId: number, pointDto: PointDto): Promise<UserPointResponseDto> {
+    const amount = pointDto.getAmount();
+    const transactionTime = Date.now();
+
+    // 포인트 이력 저장
     await this.pointHistoryRepository.insert(
       PointHistoryDomain.create(
         userId,
-        amount.getAmount(),
+        amount,
         TransactionType.USE,
-        Date.now(),
+        transactionTime,
       ),
     );
 
-    const beforeUseUserPointEntity =
-      await this.userPointRepository.selectById(userId);
-    const userPointDomain: UserPointDomain = this.userPointMapper.toDomain(
-      beforeUseUserPointEntity,
-    );
-    userPointDomain.use(amount.getAmount());
+    // 사용자 기존 포인트 조회
+    const userPointEntity = await this.userPointRepository.selectById(userId);
+    if (!userPointEntity) {
+      throw new Error('사용자의 포인트가 존재하지 않습니다.');
+    }
 
-    await this.userPointRepository.insertOrUpdate(
-      userId,
-      userPointDomain.getPoint(),
-    );
+    // 포인트 사용 처리
+    const userPointDomain = this.userPointMapper.toDomain(userPointEntity);
+    userPointDomain.use(amount, transactionTime);
+    await this.userPointRepository.insertOrUpdate(userPointDomain);
+
+    // DTO 변환 후 반환
     return this.userPointMapper.toDto(userPointDomain);
   }
+
   async getPoint(userId: number): Promise<UserPointResponseDto> {
     const userPointEntity = await this.userPointRepository.selectById(userId);
     const userPointDomain = this.userPointMapper.toDomain(userPointEntity);

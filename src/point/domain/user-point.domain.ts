@@ -32,15 +32,16 @@ export class UserPointDomain {
     return this.updateMillis;
   }
 
-  public charge(amount: number): void {
+  public charge(amount: number, updateMillis: number): void {
     if (amount <= 0) {
       throw new Error('충전 금액은 0보다 커야 합니다.');
     }
 
     this.point += amount;
+    this.updateMillis = updateMillis;
   }
 
-  public use(amount: number): void {
+  public use(amount: number, updateMillis: number): void {
     if (amount <= 0) {
       throw new Error('사용 금액은 0보다 커야 합니다.');
     }
@@ -50,5 +51,6 @@ export class UserPointDomain {
     }
 
     this.point -= amount;
+    this.updateMillis = updateMillis;
   }
 }
