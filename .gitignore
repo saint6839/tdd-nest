@@ -2,3 +2,8 @@ node_modules
 yarn.lock
 .eslintrc.js
 .prettierrc
+*.js
+*.js.map
+
+*.d.ts
+tsconfig.build.tsbuildinfo
