@@ -26,6 +26,12 @@ export class PointService implements IPointService {
     private readonly userPointMapper: UserPointMapper,
   ) {}
 
+  /**
+   * @description 사용자의 포인트를 충전합니다.
+   * @param userId 충전할 사용자 ID
+   * @param pointDto 충전할 금액
+   * @returns 사용자의 현재 포인트
+   */
   async charge(
     userId: number,
     pointDto: PointDto,
@@ -65,6 +71,12 @@ export class PointService implements IPointService {
     return this.userPointMapper.toDto(userPointDomain);
   }
 
+  /**
+   * @description 사용자의 포인트를 사용합니다.
+   * @param userId 포인트를 차감할 사용자 ID
+   * @param pointDto 차감할 금액
+   * @returns 사용자의 현재 포인트
+   */
   async use(userId: number, pointDto: PointDto): Promise<UserPointResponseDto> {
     const amount = pointDto.getAmount();
     const transactionTime = Date.now();
@@ -94,6 +106,11 @@ export class PointService implements IPointService {
     return this.userPointMapper.toDto(userPointDomain);
   }
 
+  /**
+   * @description 사용자의 포인트를 조회합니다.
+   * @param userId 포인트를 조회할 사용자 ID
+   * @returns 사용자의 현재 포인트
+   */
   async getPoint(userId: number): Promise<UserPointResponseDto> {
     const userPointEntity = await this.userPointRepository.selectById(userId);
     const userPointDomain = this.userPointMapper.toDomain(userPointEntity);
