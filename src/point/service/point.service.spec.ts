@@ -242,6 +242,46 @@ describe('PointService', () => {
         expect(e.message).toBe('포인트 금액은 0보다 커야 합니다.');
       }
     });
+
+    it('포인트 사용 시, 한 사용자가 동시에 여러번의 사용을 요청했을 때 사용이 잘 이루어지는지 테스트', async () => {
+      //given
+      await pointService.charge(1, new PointBody(1000));
+      const useSpy = jest.spyOn(pointService, 'use');
+      await Promise.all([
+        pointService.use(1, new PointBody(500)),
+        pointService.use(1, new PointBody(300)),
+        pointService.use(1, new PointBody(200)),
+      ]);
+      //when
+      const result = await pointService.getPoint(1);
+      //then
+      expect(result.getPoint()).toBe(0);
+      expect(useSpy).toHaveBeenCalledTimes(3);
+      useSpy.mockRestore();
+    });
+
+    it('포인트 사용 시, 여러 사용자가 동시에 사용을 요청했을 때 사용이 잘 이루어지는지 테스트', async () => {
+      //given
+      await pointService.charge(1, new PointBody(1000));
+      await pointService.charge(2, new PointBody(2000));
+      await pointService.charge(3, new PointBody(3000));
+      const useSpy = jest.spyOn(pointService, 'use');
+      await Promise.all([
+        pointService.use(1, new PointBody(500)),
+        pointService.use(2, new PointBody(1000)),
+        pointService.use(3, new PointBody(2000)),
+      ]);
+      //when
+      const result1 = await pointService.getPoint(1);
+      const result2 = await pointService.getPoint(2);
+      const result3 = await pointService.getPoint(3);
+      //then
+      expect(result1.getPoint()).toBe(500);
+      expect(result2.getPoint()).toBe(1000);
+      expect(result3.getPoint()).toBe(1000);
+      expect(useSpy).toHaveBeenCalledTimes(3);
+      useSpy.mockRestore();
+    });
   });
 
   describe('포인트 이력 조회 테스트', () => {
