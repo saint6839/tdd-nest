@@ -92,6 +92,18 @@ describe('PointService', () => {
       expect(result.getPoint()).toBe(2000);
     });
 
+    it('포인트를 0원 이하로 충전할 경우 에러가 발생하는지 테스트', async () => {
+      //given
+      //when
+      try {
+        await pointService.charge(1, new PointBody(-1000));
+      } catch (e) {
+        //then
+        expect(e).toBeInstanceOf(Error);
+        expect(e.message).toBe('포인트 금액은 0보다 커야 합니다.');
+      }
+    });
+
     it('userPointMapper.toDomain과 toDto가 올바르게 호출되는지 테스트', async () => {
       //given
       const toDomainSpy = jest.spyOn(userPointMapper, 'toDomain');
@@ -167,6 +179,31 @@ describe('PointService', () => {
       //then
       expect(result.getPoint()).toBe(200);
     });
+
+    it('포인트를 보유한 금액보다 사용 금액이 클 경우 에러가 발생하는지 테스트', async () => {
+      //given
+      await pointService.charge(1, new PointBody(1000));
+      //when
+      try {
+        await pointService.use(1, new PointBody(1500));
+      } catch (e) {
+        //then
+        expect(e).toBeInstanceOf(Error);
+        expect(e.message).toBe('포인트가 부족합니다.');
+      }
+    });
+
+    it('포인트를 0원 이하로 사용할 경우 에러가 발생하는지 테스트', async () => {
+      //given
+      //when
+      try {
+        await pointService.use(1, new PointBody(-1000));
+      } catch (e) {
+        //then
+        expect(e).toBeInstanceOf(Error);
+        expect(e.message).toBe('포인트 금액은 0보다 커야 합니다.');
+      }
+    });
   });
 
   describe('포인트 이력 조회 테스트', () => {
@@ -185,5 +222,13 @@ describe('PointService', () => {
       expect(result[2].getType()).toBe(TransactionType.USE);
       expect(result[2].getAmount()).toBe(300);
     });
+  });
+
+  it('포인트 이력 조회 시, 조회할 이력이 없을 경우 빈 배열을 반환하는지 테스트', async () => {
+    //given
+    //when
+    const result = await pointService.getHistory(1);
+    //then
+    expect(result).toEqual([]);
   });
 });
