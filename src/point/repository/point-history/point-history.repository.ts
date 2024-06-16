@@ -2,7 +2,8 @@ import { PointHistoryMapper } from '../../mapper/point-history.mapper';
 import { IPointHistoryRepository as IPointHistoryRepository } from './point-history.repository.interface';
 import { Injectable } from '@nestjs/common';
 import { PointHistoryTable } from 'src/database/pointhistory.table';
-import { PointHistory, TransactionType } from 'src/point/model/point.model';
+import { PointHistoryDomain } from 'src/point/domain/point-history.domain';
+import { PointHistory } from 'src/point/model/point.model';
 
 export const POINT_HISTORY_REPOSITORY_TOKEN = Symbol('IPointHistoryRepository');
 
@@ -12,17 +13,12 @@ export class PointHistoryRepository implements IPointHistoryRepository {
     private readonly pointHistoryModel: PointHistoryTable,
     private readonly pointHistoryMapper: PointHistoryMapper,
   ) {}
-  async insert(
-    userId: number,
-    amount: number,
-    transactionType: TransactionType,
-    timestamp: number,
-  ): Promise<PointHistory> {
+  async insert(pointHistoryDomain: PointHistoryDomain): Promise<PointHistory> {
     return this.pointHistoryModel.insert(
-      userId,
-      amount,
-      transactionType,
-      timestamp,
+      pointHistoryDomain.getUserId(),
+      pointHistoryDomain.getAmount(),
+      pointHistoryDomain.getType(),
+      pointHistoryDomain.getTimeMillis(),
     );
   }
   selectAllByUserId(userId: number): Promise<PointHistory[]> {

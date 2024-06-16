@@ -8,6 +8,8 @@ import { TransactionType } from '../model/point.model';
 import { PointHistoryMapper } from '../mapper/point-history.mapper';
 import { UserPointMapper } from '../mapper/user-point.mapper';
 import { UserPointResponseDto } from '../dto/user-point/user-point.response.dto';
+import { PointBody as PointDto } from '../dto/point.dto';
+import { PointHistoryDomain } from '../domain/point-history.domain';
 
 export const POINT_SERVICE_TOKEN = Symbol('IPointService');
 
@@ -22,23 +24,28 @@ export class PointService implements IPointService {
     private readonly userPointMapper: UserPointMapper,
   ) {}
 
-  async charge(userId: number, amount: number): Promise<UserPointResponseDto> {
+  async charge(
+    userId: number,
+    pointDto: PointDto,
+  ): Promise<UserPointResponseDto> {
     await this.pointHistoryRepository.insert(
-      userId,
-      amount,
-      TransactionType.CHARGE,
-      Date.now(),
+      PointHistoryDomain.create(
+        userId,
+        pointDto.getAmount(),
+        TransactionType.CHARGE,
+        Date.now(),
+      ),
     );
 
     const userPointEntity = await this.userPointRepository.insertOrUpdate(
       userId,
-      amount,
+      pointDto.getAmount(),
     );
     const userPointDomain = this.userPointMapper.toDomain(userPointEntity);
     return this.userPointMapper.toDto(userPointDomain);
   }
 
-  use(userId: number, amount: number): Promise<void> {
+  use(userId: number, amount: PointDto): Promise<void> {
     throw new Error('Method not implemented.');
   }
   getPoint(userId: number): Promise<number> {

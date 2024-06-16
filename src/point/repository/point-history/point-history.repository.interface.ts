@@ -1,12 +1,8 @@
-import { PointHistory, TransactionType } from 'src/point/model/point.model';
+import { PointHistoryDomain } from 'src/point/domain/point-history.domain';
+import { PointHistory } from 'src/point/model/point.model';
 
 export interface IPointHistoryRepository {
-  insert(
-    userId: number,
-    amount: number,
-    transactionType: TransactionType,
-    timestamp: number,
-  ): Promise<PointHistory>;
+  insert(pointHistoryDomain: PointHistoryDomain): Promise<PointHistory>;
 
   selectAllByUserId(userId: number): Promise<PointHistory[]>;
 }
