@@ -15,8 +15,7 @@ import { TransactionType } from '../model/point.model';
 
 describe('PointService', () => {
   let pointService: IPointService;
-  let pointHistoryRepository: PointHistoryRepository; // 실제 리포지토리 타입 사용
-  let userPointRepository: UserPointRepository;
+  let pointHistoryRepository: PointHistoryRepository;
   let userPointMapper: UserPointMapper;
 
   beforeEach(async () => {
@@ -42,9 +41,6 @@ describe('PointService', () => {
     pointService = module.get<PointService>(PointService);
     pointHistoryRepository = module.get<PointHistoryRepository>(
       POINT_HISTORY_REPOSITORY_TOKEN,
-    );
-    userPointRepository = module.get<UserPointRepository>(
-      USER_POINT_REPOSITORY_TOKEN,
     );
     userPointMapper = module.get<UserPointMapper>(UserPointMapper);
   });
@@ -372,13 +368,32 @@ describe('PointService', () => {
       expect(result[2].getType()).toBe(TransactionType.USE);
       expect(result[2].getAmount()).toBe(300);
     });
+
+    it('포인트 이력 조회 시, 조회할 이력이 없을 경우 빈 배열을 반환하는지 테스트', async () => {
+      //given
+      //when
+      const result = await pointService.getHistory(1);
+      //then
+      expect(result).toEqual([]);
+    });
   });
 
-  it('포인트 이력 조회 시, 조회할 이력이 없을 경우 빈 배열을 반환하는지 테스트', async () => {
-    //given
-    //when
-    const result = await pointService.getHistory(1);
-    //then
-    expect(result).toEqual([]);
+  describe('포인트 조회 테스트', () => {
+    it('포인트 조회 시, 사용자의 포인트가 올바르게 조회되는지 테스트', async () => {
+      //given
+      await pointService.charge(1, new PointBody(1000));
+      //when
+      const result = await pointService.getPoint(1);
+      //then
+      expect(result.getPoint()).toBe(1000);
+    });
+
+    it('포인트 조회 시, 사용자의 포인트가 없을 경우 0을 반환하는지 테스트', async () => {
+      //given
+      //when
+      const result = await pointService.getPoint(1);
+      //then
+      expect(result.getPoint()).toBe(0);
+    });
   });
 });
