@@ -12,7 +12,7 @@ import { PointBody as PointDto } from '../dto/point.dto';
 import { PointHistoryDomain } from '../domain/point-history.domain';
 import { PointHistoryResponseDto } from '../dto/point-history/point-history.response.dto';
 import { UserPointDomain } from '../domain/user-point.domain';
-import { Mutex } from 'src/utils/mutex';
+import { Mutex } from 'src/utils/mutex/mutex';
 
 export const POINT_SERVICE_TOKEN = Symbol('IPointService');
 
