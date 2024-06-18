@@ -7,8 +7,4 @@ export class PointBody {
   constructor(amount: number) {
     this.amount = amount;
   }
-
-  getAmount(): number {
-    return this.amount;
-  }
 }

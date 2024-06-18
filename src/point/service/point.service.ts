@@ -45,7 +45,7 @@ export class PointService implements IPointService {
     userId: number,
     pointDto: PointDto,
   ): Promise<UserPointResponseDto> {
-    const amount = pointDto.getAmount();
+    const amount = pointDto.amount;
     const transactionTime = Date.now();
 
     // 사용자의 포인트 충전 시, 동시성 문제를 해결하기 위해 Mutex 사용
@@ -95,7 +95,7 @@ export class PointService implements IPointService {
    * @returns 사용자의 현재 포인트
    */
   async use(userId: number, pointDto: PointDto): Promise<UserPointResponseDto> {
-    const amount = pointDto.getAmount();
+    const amount = pointDto.amount;
     const transactionTime = Date.now();
 
     // 사용자의 포인트 사용 시, 동시성 문제를 해결하기 위해 Mutex 사용
