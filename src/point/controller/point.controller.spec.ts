@@ -36,8 +36,8 @@ describe('PointController e2e test', () => {
 
       //then
       expect(response.status).toBe(200);
-      expect(response.body.id).toBe(userId);
-      expect(response.body.point).toBe(0);
+      expect(response.body.data.id).toBe(userId);
+      expect(response.body.data.point).toBe(0);
     });
 
     it('저장되어있는 사용자 포인트가 있을 경우에는 해당 포인트를 반환한다.', async () => {
@@ -54,8 +54,8 @@ describe('PointController e2e test', () => {
 
       //then
       expect(response.status).toBe(200);
-      expect(response.body.id).toBe(userId);
-      expect(response.body.point).toBe(100);
+      expect(response.body.data.id).toBe(userId);
+      expect(response.body.data.point).toBe(100);
     });
 
     it('userId가 숫자가 아닌 경우 500을 반환한다.', async () => {
@@ -109,7 +109,7 @@ describe('PointController e2e test', () => {
 
       //then
       expect(response.status).toBe(200);
-      expect(response.body).toHaveLength(0);
+      expect(response.body.data).toHaveLength(0);
     });
 
     it('포인트 이력이 있을 경우 해당 이력을 반환한다.', async () => {
@@ -126,8 +126,8 @@ describe('PointController e2e test', () => {
 
       //then
       expect(response.status).toBe(200);
-      expect(response.body).toHaveLength(1);
-      expect(response.body[0].amount).toBe(100);
+      expect(response.body.data).toHaveLength(1);
+      expect(response.body.data[0].amount).toBe(100);
     });
 
     it('userId가 숫자가 아닌 경우 500을 반환한다.', async () => {
@@ -196,7 +196,7 @@ describe('PointController e2e test', () => {
 
       //then
       expect(response.status).toBe(200);
-      expect(response.body.point).toBe(amount);
+      expect(response.body.data.point).toBe(amount);
     });
 
     it('userId가 숫자가 아닌 경우 500을 반환한다.', async () => {
@@ -272,7 +272,7 @@ describe('PointController e2e test', () => {
 
       //then
       expect(response.status).toBe(200);
-      expect(response.body.point).toBe(50);
+      expect(response.body.data.point).toBe(50);
     });
 
     it('userId가 숫자가 아닌 경우 500을 반환한다.', async () => {
