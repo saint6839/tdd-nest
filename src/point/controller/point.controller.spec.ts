@@ -241,7 +241,7 @@ describe('PointController e2e test', () => {
       expect(response.status).toBe(500);
     });
 
-    it('amount가 0보다 작은 경우 500을 반환한다.', async () => {
+    it('amount가 0보다 작은 경우 400을 반환한다.', async () => {
       //given
       const userId = 7;
       const amount = -1;
@@ -252,7 +252,7 @@ describe('PointController e2e test', () => {
         .send(new PointDto(amount));
 
       //then
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(400);
     });
   });
 
@@ -317,7 +317,7 @@ describe('PointController e2e test', () => {
       expect(response.status).toBe(500);
     });
 
-    it('amount가 0보다 작은 경우 500을 반환한다.', async () => {
+    it('amount가 0보다 작은 경우 400을 반환한다.', async () => {
       //given
       const userId = 9;
       const amount = -1;
@@ -328,7 +328,7 @@ describe('PointController e2e test', () => {
         .send(new PointDto(amount));
 
       //then
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(400);
     });
 
     it('포인트가 부족한 경우 500을 반환한다.', async () => {
