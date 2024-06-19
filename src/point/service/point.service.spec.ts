@@ -49,6 +49,52 @@ describe('PointService', () => {
     expect(pointService).toBeDefined();
   });
 
+  describe('포인트 충전/사용 동시성 테스트', () => {
+    it('포인트 충전과 사용이 동시에 여러번 일어났을때 최종 결과값이 올바른지 테스트', async () => {
+      //given
+      const chargeSpy = jest.spyOn(pointService, 'charge');
+      const useSpy = jest.spyOn(pointService, 'use');
+
+      //when
+      await Promise.all([
+        pointService.charge(1, new PointBody(1000)),
+        pointService.use(1, new PointBody(500)),
+        pointService.charge(1, new PointBody(2000)),
+        pointService.use(1, new PointBody(1000)),
+      ]);
+      //then
+      const finalResult = await pointService.getPoint(1);
+      expect(chargeSpy).toHaveBeenCalledTimes(2);
+      expect(useSpy).toHaveBeenCalledTimes(2);
+      expect(finalResult.getPoint()).toBe(1500); // 1000 - 500 + 2000 - 1000
+      chargeSpy.mockRestore();
+      useSpy.mockRestore();
+    });
+
+    it('포인트 충전과 사용이 동시에 여러번 일어나는 중에, 포인트 사용 잔액이 모자랄 경우에 오류가 발생하는지 테스트', async () => {
+      //given
+      const chargeSpy = jest.spyOn(pointService, 'charge');
+      const useSpy = jest.spyOn(pointService, 'use');
+
+      //when
+      const results = await Promise.allSettled([
+        pointService.charge(1, new PointBody(500)),
+        pointService.use(1, new PointBody(500)),
+        pointService.charge(1, new PointBody(1000)),
+        pointService.use(1, new PointBody(2000)),
+      ]);
+
+      //then
+      const rejected = results.filter(result => result.status === 'rejected');
+      expect(rejected.length).toBe(1);
+      expect(rejected[0].status).toBe('rejected');
+      expect(chargeSpy).toHaveBeenCalledTimes(2);
+      expect(useSpy).toHaveBeenCalledTimes(2);
+      chargeSpy.mockRestore();
+      useSpy.mockRestore();
+    });
+  });
+
   describe('포인트 충전 테스트', () => {
     it('포인트 충전 시, 충전을 요청한 금액만큼 충전이 잘 되는지 테스트', async () => {
       //given
