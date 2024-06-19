@@ -16,6 +16,7 @@ export class PointHistoryTable {
     transactionType: TransactionType,
     updateMillis: number,
   ): Promise<PointHistory> {
+    this.isValidId(userId);
     return new Promise(r => {
       setTimeout(() => {
         const history: PointHistory = {
@@ -32,8 +33,14 @@ export class PointHistoryTable {
   }
 
   selectAllByUserId(userId: number): Promise<PointHistory[]> {
+    this.isValidId(userId);
     return new Promise(r => {
       r(this.table.filter(v => v.userId == userId));
     });
+  }
+
+  private isValidId(id: number) {
+    if (Number.isInteger(id) && id > 0) return;
+    throw new Error('올바르지 않은 ID 값 입니다.');
   }
 }
