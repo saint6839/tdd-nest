@@ -9,10 +9,10 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { PointBody as PointDto } from '../dto/point.dto';
-import { POINT_SERVICE_TOKEN } from '../service/point.service';
 import { IPointService } from '../service/point.service.interface';
 import { UserPointResponseDto } from '../dto/user-point/user-point.response.dto';
 import { PointHistoryResponseDto } from '../dto/point-history/point-history.response.dto';
+import { POINT_SERVICE_TOKEN } from '../service/point.service';
 
 @Controller('/point')
 export class PointController {

@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PointService } from './point.service';
 import { PointHistoryRepository } from '../repository/point-history/point-history.repository'; // 실제 리포지토리 가져오기
 import { IPointService } from './point.service.interface';
 import { POINT_HISTORY_REPOSITORY_TOKEN } from '../repository/point-history/point-history.repository';
@@ -12,6 +11,7 @@ import { PointHistoryMapper } from '../mapper/point-history.mapper';
 import { UserPointMapper } from '../mapper/user-point.mapper';
 import { PointBody } from '../dto/point.dto';
 import { TransactionType } from '../model/point.model';
+import { PointService } from './point.service';
 
 describe('PointService', () => {
   let pointService: IPointService;

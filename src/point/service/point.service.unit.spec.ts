@@ -1,7 +1,6 @@
 import { POINT_HISTORY_REPOSITORY_TOKEN } from './../repository/point-history/point-history.repository';
 import { USER_POINT_REPOSITORY_TOKEN } from './../repository/user-point/user-point.repository';
 import { Test, TestingModule } from '@nestjs/testing';
-import { PointService } from './point.service';
 import { IPointHistoryRepository } from '../repository/point-history/point-history.repository.interface';
 import { IUserPointRepository } from '../repository/user-point/user-point.repository.interface';
 import { PointHistoryMapper } from '../mapper/point-history.mapper';
@@ -10,6 +9,7 @@ import { PointBody as PointDto } from '../dto/point.dto';
 import { PointHistory, TransactionType, UserPoint } from '../model/point.model';
 import { PointHistoryDomain } from '../domain/point-history.domain';
 import { UserPointDomain } from '../domain/user-point.domain';
+import { PointService } from './point.service';
 
 describe('PointService', () => {
   let pointService: PointService;
