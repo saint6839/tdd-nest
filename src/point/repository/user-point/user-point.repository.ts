@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { IUserPointRepository } from './user-point.repository.interface';
 import { UserPointTable } from 'src/database/userpoint.table';
 import { UserPoint } from 'src/point/model/point.model';
-import { UserPointDomain } from 'src/point/domain/user-point.domain';
+import { UserPointDomain } from 'src/point/domain/user-point/user-point.domain';
 
 export const USER_POINT_REPOSITORY_TOKEN = Symbol('IUserPointRepository');
 

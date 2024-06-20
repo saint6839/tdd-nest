@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { UserPointDomain } from '../domain/user-point.domain';
+import { UserPointDomain } from '../domain/user-point/user-point.domain';
 import { UserPoint } from '../model/point.model';
 import { UserPointResponseDto } from '../dto/user-point/user-point.response.dto';
 

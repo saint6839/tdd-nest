@@ -7,8 +7,8 @@ import { PointHistoryMapper } from '../mapper/point-history.mapper';
 import { UserPointMapper } from '../mapper/user-point.mapper';
 import { PointBody as PointDto } from '../dto/point.dto';
 import { PointHistory, TransactionType, UserPoint } from '../model/point.model';
-import { PointHistoryDomain } from '../domain/point-history.domain';
-import { UserPointDomain } from '../domain/user-point.domain';
+import { PointHistoryDomain } from '../domain/point-history/point-history.domain';
+import { UserPointDomain } from '../domain/user-point/user-point.domain';
 import { PointService } from './point.service';
 
 describe('PointService', () => {

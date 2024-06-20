@@ -1,4 +1,4 @@
-import { PointHistoryDomain } from 'src/point/domain/point-history.domain';
+import { PointHistoryDomain } from 'src/point/domain/point-history/point-history.domain';
 import { PointHistory } from 'src/point/model/point.model';
 
 export interface IPointHistoryRepository {

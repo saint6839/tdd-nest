@@ -9,9 +9,9 @@ import { PointHistoryMapper } from '../mapper/point-history.mapper';
 import { UserPointMapper } from '../mapper/user-point.mapper';
 import { UserPointResponseDto } from '../dto/user-point/user-point.response.dto';
 import { PointBody as PointDto } from '../dto/point.dto';
-import { PointHistoryDomain } from '../domain/point-history.domain';
+import { PointHistoryDomain } from '../domain/point-history/point-history.domain';
 import { PointHistoryResponseDto } from '../dto/point-history/point-history.response.dto';
-import { UserPointDomain } from '../domain/user-point.domain';
+import { UserPointDomain } from '../domain/user-point/user-point.domain';
 import { Mutex } from 'src/utils/mutex/mutex';
 
 export const POINT_SERVICE_TOKEN = Symbol('IPointService');

@@ -1,4 +1,4 @@
-import { TransactionType } from '../model/point.model';
+import { TransactionType } from '../../model/point.model';
 import { PointHistoryDomain } from './point-history.domain';
 
 describe('PointHistoryDomain', () => {

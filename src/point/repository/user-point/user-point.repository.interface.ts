@@ -1,4 +1,4 @@
-import { UserPointDomain } from 'src/point/domain/user-point.domain';
+import { UserPointDomain } from 'src/point/domain/user-point/user-point.domain';
 import { UserPoint } from 'src/point/model/point.model';
 
 export interface IUserPointRepository {

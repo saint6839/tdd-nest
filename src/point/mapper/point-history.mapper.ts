@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PointHistory } from 'src/point/model/point.model';
-import { PointHistoryDomain } from '../domain/point-history.domain';
+import { PointHistoryDomain } from '../domain/point-history/point-history.domain';
 import { PointHistoryResponseDto } from '../dto/point-history/point-history.response.dto';
 
 @Injectable()
